@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Return Book</title>
+</head>
+<body>
+    <h1>Return a Book</h1>
+    <form method="post">
+        <label for="loan_id">Select Loan:</label>
+        <select id="loan_id" name="loan_id">
+            {% for loan in loans %}
+            <option value="{{ loan[0] }}">book: {{ loan[1] }},&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; author: {{ loan[2] }}
+
+            </option>
+            {% endfor %}
+        </select><br><br>
+        
+        <button type="submit">Return Book</button>
+    </form>
+</body>
+</html>
