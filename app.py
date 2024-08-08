@@ -15,18 +15,36 @@ def show_books():
     conn.close()
     return render_template('show_books.html', books=books)
 
+@app.route('/show_members')
+def show_members():
+    conn = sqlite3.connect('library.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM Members')
+    members = c.fetchall()
+    c.execute('''
+    SELECT Members.name, GROUP_CONCAT(Books.title, ', ') AS books_borrowed
+    FROM Members
+    LEFT JOIN Loans ON Members.member_id = Loans.member_id
+    LEFT JOIN Books ON Loans.book_id = Books.book_id
+    GROUP BY Members.member_id
+    ''')
+    member_loans = c.fetchall()
+    conn.close()
+    return render_template('show_members.html', members=members, member_loans=member_loans)
+
+
 # Endpoint to add a book
 @app.route('/add_book', methods=['GET', 'POST'])
 def add_book():
     if request.method == 'POST':
         book_details = request.form
         title = book_details['title']
-        author_id = book_details['author_id']
+        author = book_details['author']
         published_year = book_details['published_year']
         
         conn = sqlite3.connect('library.db')
         c = conn.cursor()
-        c.execute('INSERT INTO Books (title, author_id, published_year, available) VALUES (?, ?, ?, 1)', (title, author_id, published_year))
+        c.execute('INSERT INTO Books (title, author, published_year, available) VALUES (?, ?, ?, 1)', (title, author, published_year))
         conn.commit()
         conn.close()
         
@@ -66,14 +84,16 @@ def loan_book():
         conn.close()
         
         return redirect(url_for('show_books'))
+    
     conn = sqlite3.connect('library.db')
     c = conn.cursor()
     c.execute('SELECT * FROM Books WHERE available = 1')
-    available_books = c.fetchall()
+    books = c.fetchall()
     c.execute('SELECT * FROM Members')
     members = c.fetchall()
     conn.close()
-    return render_template('loan_book.html', books=available_books, members=members)
+    return render_template('loan_book.html', books=books, members=members)
+
 
 # Endpoint to return a book
 @app.route('/return_book', methods=['GET', 'POST'])
@@ -97,11 +117,75 @@ def return_book():
         SELECT Loans.loan_id, Books.title, Books.author 
         FROM Loans
         JOIN Books ON Loans.book_id = Books.book_id
-        WHERE Books.available IS 0
+        WHERE Books.available IS 0 AND Loans.return_date IS NULL
     ''')
     loans = c.fetchall()
     conn.close()
     return render_template('return_book.html', loans=loans)
+
+@app.route('/update_book/<int:book_id>', methods=['GET', 'POST'])
+def update_book(book_id):
+    conn = sqlite3.connect('library.db')
+    c = conn.cursor()
+
+    if request.method == 'POST':
+        updated_details = request.form
+        title = updated_details['title']
+        author = updated_details['author']
+        published_year = updated_details['published_year']
+        c.execute('UPDATE Books SET title = ?, author = ?, published_year=?  WHERE book_id = ?', (title, author,published_year , book_id))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('show_books'))
+
+    c.execute('SELECT * FROM Books WHERE book_id = ?', (book_id,))
+    book = c.fetchone()
+    conn.close()
+
+    return render_template('update_book.html', book=book)
+
+
+@app.route('/delete_book/<int:book_id>', methods=['POST'])
+def delete_book(book_id):
+    conn = sqlite3.connect('library.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM Books WHERE book_id = ?', (book_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('show_books'))
+
+@app.route('/update_member/<int:member_id>', methods=['GET', 'POST'])
+def update_member(member_id):
+    conn = sqlite3.connect('library.db')
+    c = conn.cursor()
+
+    if request.method == 'POST':
+        updated_details = request.form
+        name = updated_details['name']
+        c.execute('UPDATE Members SET name = ? WHERE member_id = ?', (name, member_id))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('show_members'))
+
+    c.execute('SELECT * FROM Members WHERE member_id = ?', (member_id,))
+    member = c.fetchone()
+    conn.close()
+
+    return render_template('update_member.html', member=member)
+
+
+@app.route('/delete_member/<int:member_id>', methods=['POST'])
+def delete_member(member_id):
+    conn = sqlite3.connect('library.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM Members WHERE member_id = ?', (member_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('show_members'))
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block title %}Books{% endblock %}
+
+{% block header %}add a book {% endblock %}
+
+{% block content %}
+    {{member_loans[0][1]}}
+    <ul>
+        {% for member in members %}
+        <li>
+            {{ member[1] }} - books loaned: 
+            {% for loan in member_loans %}
+                {% if loan[0] == member[1] %}
+                    {{ loan[1] }}
+                {% endif %}
+            {% endfor %}
+            <a href="{{ url_for('update_member', member_id=member[0]) }}">Update</a> 
+            <form method="post" action="{{ url_for('delete_member', member_id=member[0]) }}" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endblock %}
+

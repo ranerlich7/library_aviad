@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Loan Book</title>
-</head>
-<body>
-    <h1>Loan a Book</h1>
+    {% extends "base.html" %}
+
+    {% block title %}Books{% endblock %}
+    
+    {% block header %}loan book {% endblock %}
+    
+    {% block content %}
     <form method="post">
         <label for="book_id">Select Book:</label>
         <select id="book_id" name="book_id">
@@ -23,5 +27,5 @@
         
         <button type="submit">Loan Book</button>
     </form>
-</body>
-</html>
+    {% endblock %}
+

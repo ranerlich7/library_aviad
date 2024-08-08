@@ -52,5 +52,6 @@ for book in books:
 for member in members:
     c.execute('INSERT INTO Members (name) VALUES (?)', (member,))
 
+
 conn.commit()
 conn.close()
