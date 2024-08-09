@@ -6,8 +6,6 @@ A simple library app. tou can borrow books return ect.
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
 
 
 ## Installation
@@ -24,7 +22,7 @@ python -m venv venv
 source ./venv/Scripts/activate
 pip install -r requirements.txt
 
-## Usage
+## usage
 Instructions on how to use the project, including code examples or screenshots.
 
 ```bash
