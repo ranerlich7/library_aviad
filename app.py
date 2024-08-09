@@ -19,18 +19,27 @@ def show_books():
 def show_members():
     conn = sqlite3.connect('library.db')
     c = conn.cursor()
+    
+    # קבלת כל הממברים
     c.execute('SELECT * FROM Members')
     members = c.fetchall()
+    
+    # קבלת כל הספרים שהושאלו ושלא הוחזרו כולל תאריך ההשאלה
     c.execute('''
-    SELECT Members.name, GROUP_CONCAT(Books.title, ', ') AS books_borrowed
+    SELECT Members.member_id, Members.name, Books.title, Loans.loan_date 
     FROM Members
     LEFT JOIN Loans ON Members.member_id = Loans.member_id
     LEFT JOIN Books ON Loans.book_id = Books.book_id
-    GROUP BY Members.member_id
+    WHERE Loans.return_date IS NULL
+    ORDER BY Members.member_id
     ''')
     member_loans = c.fetchall()
+    
     conn.close()
+    
     return render_template('show_members.html', members=members, member_loans=member_loans)
+
+
 
 
 # Endpoint to add a book
@@ -114,12 +123,14 @@ def return_book():
     conn = sqlite3.connect('library.db')
     c = conn.cursor()
     c.execute('''
-        SELECT Loans.loan_id, Books.title, Books.author 
-        FROM Loans
-        JOIN Books ON Loans.book_id = Books.book_id
-        WHERE Books.available IS 0 AND Loans.return_date IS NULL
+    SELECT Loans.loan_id, Books.title, Books.author, Members.name
+    FROM Loans
+    JOIN Books ON Loans.book_id = Books.book_id
+    JOIN Members ON Loans.member_id = Members.member_id
+    WHERE Loans.return_date IS NULL
     ''')
     loans = c.fetchall()
+
     conn.close()
     return render_template('return_book.html', loans=loans)
 

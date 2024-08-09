@@ -1,22 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Return Book</title>
-</head>
-<body>
-    <h1>Return a Book</h1>
-    <form method="post">
-        <label for="loan_id">Select Loan:</label>
-        <select id="loan_id" name="loan_id">
-            {% for loan in loans %}
-            <option value="{{ loan[0] }}">book: {{ loan[1] }},&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; author: {{ loan[2] }}
+{% extends "base.html" %}
 
-            </option>
-            {% endfor %}
-        </select><br><br>
-        
-        <button type="submit">Return Book</button>
+{% block title %}Books{% endblock %}
+
+{% block header %}return book {% endblock %}
+
+{% block content %}
+<h1 class="text-center mt-4">Return a Book</h1>
+<div class="container mt-4">
+    <form method="post" class="p-4 bg-light rounded shadow">
+        <div class="form-group">
+            <label for="loan_id">Select Loan:</label>
+            <select id="loan_id" name="loan_id" class="form-control">
+                {% for loan in loans %}
+                <option value="{{ loan[0] }}">
+                    Book: {{ loan[1] }} | Author: {{ loan[2] }} | Borrowed by: {{ loan[3] }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Return Book</button>
     </form>
-</body>
-</html>
+</div>
+
+    {% endblock %}
+

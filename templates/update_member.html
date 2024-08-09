@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Update Member</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Books{% endblock %}
+
+{% block header %}update member {% endblock %}
+
+{% block content %}
     <h1>Update Member</h1>
     <form method="post">
         <label for="name">Name:</label>
@@ -12,5 +12,6 @@
 
         <button type="submit">Update Member</button>
     </form>
-</body>
-</html>
+    {% endblock %}
+
+
