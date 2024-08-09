@@ -194,6 +194,24 @@ def delete_member(member_id):
     conn.close()
     return redirect(url_for('show_members'))
 
+@app.route('/search_books', methods=['GET', 'POST'])
+def search_books():
+    query = ''
+    books = []
+    
+    if request.method == 'POST':
+        query = request.form['query']
+        
+        conn = sqlite3.connect('library.db')
+        c = conn.cursor()
+        c.execute('''
+            SELECT * FROM Books
+            WHERE title LIKE ? OR author LIKE ?
+        ''', ('%' + query + '%', '%' + query + '%'))
+        books = c.fetchall()
+        conn.close()
+    
+    return render_template('search_books.html', query=query, books=books)
 
 
 
