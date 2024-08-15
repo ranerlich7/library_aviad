@@ -213,6 +213,30 @@ def search_books():
     
     return render_template('search_books.html', query=query, books=books)
 
+@app.route('/statistics')
+def statistics():
+    conn = sqlite3.connect('library.db')
+    c = conn.cursor()
+
+    # Get the total number of books
+    c.execute('SELECT COUNT(*) FROM Books')
+    total_books = c.fetchone()[0]
+
+    # Get the number of currently loaned books
+    c.execute('SELECT COUNT(*) FROM Loans WHERE return_date IS NULL')
+    loaned_books = c.fetchone()[0]
+
+    # Get the total number of members
+    c.execute('SELECT COUNT(*) FROM Members')
+    total_members = c.fetchone()[0]
+
+    # Get the number of books available
+    c.execute('SELECT COUNT(*) FROM Books WHERE available = 1')
+    available_books = c.fetchone()[0]
+
+    conn.close()
+
+    return render_template('statistics.html', total_books=total_books, loaned_books=loaned_books, total_members=total_members, available_books=available_books)
 
 
 
